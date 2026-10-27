@@ -1,0 +1,378 @@
+<title>Aura Numerology</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one-column app shell, dusk-sky background, fixed bottom tab bar, cards on deep indigo */
+:root{
+  --sky-top:#120c2a; --sky-mid:#2a1236; --dusk:#c2410c; --ink:#f4efff; --muted:#a9a3d6;
+  --card:rgba(26,22,58,.72); --line:rgba(169,163,214,.18); --gold:#fbbf24; --amber:#f97316;
+  --good:#34d399; --bad:#f87171; --orb1:#a5b4fc; --orb2:#f9a8d4;
+  --display:"Fraunces",Georgia,serif; --body:"Manrope",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:var(--body);color:var(--ink);background:var(--sky-top);
+  background-image:radial-gradient(1200px 500px at 50% 115%,rgba(249,115,22,.55),transparent 60%),
+  linear-gradient(180deg,var(--sky-top) 0%,var(--sky-mid) 55%,#0a0718 100%);background-attachment:fixed}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--sky-top)}
+.stars{position:fixed;inset:0;pointer-events:none;z-index:0}
+main{position:relative;z-index:1;max-width:760px;margin:0 auto;padding-block:20px 120px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:18px}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance}
+h2{font-size:1.35rem;color:var(--amber)}
+.eyebrow{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--amber);font-weight:700}
+.muted{color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;backdrop-filter:blur(8px)}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.btn{border:0;border-radius:999px;padding:12px 22px;font:700 1rem var(--body);cursor:pointer;color:#2b1400;
+  background:linear-gradient(180deg,#fcd34d,var(--amber))}
+.btn.block{width:100%}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+input,textarea,select{width:100%;background:rgba(10,7,24,.6);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:12px;font:inherit}
+label{display:grid;gap:6px;font-weight:600;font-size:.9rem}
+.top{display:flex;justify-content:space-between;align-items:center}
+.logo{display:flex;gap:10px;align-items:center;font-weight:700;color:var(--muted)}
+.logo svg{width:38px;height:38px}
+.hero{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;min-height:180px}
+.hero h1{font-size:clamp(1.8rem,6vw,2.6rem);line-height:1.05;margin:6px 0 14px}
+.orb{width:clamp(90px,26vw,170px);aspect-ratio:1;max-width:100%;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,#c7d2fe,var(--orb1) 40%,#7c6cf0 65%,var(--orb2));box-shadow:0 0 50px rgba(165,180,252,.45)}
+.dots{display:flex;gap:6px;justify-content:center}
+.dots i{width:7px;height:7px;border-radius:9px;background:var(--line)}
+.dots i.on{width:22px;background:var(--ink)}
+.daycard{display:flex;gap:14px;align-items:center;cursor:pointer}
+.num{font-family:var(--display);font-weight:700;color:var(--gold);font-size:2rem;min-width:62px;height:62px;display:grid;place-items:center;border-radius:16px;background:rgba(255,255,255,.07)}
+.tools{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.tool{display:grid;justify-items:center;gap:8px;background:none;border:0;color:var(--ink);font:600 .85rem var(--body);cursor:pointer}
+.tool span{width:62px;height:62px;border-radius:18px;display:grid;place-items:center;background:var(--card);border:1px solid var(--line);font-size:1.5rem;color:var(--amber)}
+.ask{display:flex;gap:10px;align-items:center;background:var(--card);border:1px solid rgba(165,180,252,.45);border-radius:999px;padding:6px 6px 6px 8px;box-shadow:0 0 24px rgba(124,108,240,.3)}
+.ask .mini{width:36px;height:36px;border-radius:50%;flex:none;background:radial-gradient(circle at 30% 30%,#c7d2fe,#7c6cf0 60%,var(--orb2))}
+.ask input{border:0;background:transparent;padding:8px}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center}
+.bar{height:70px;width:22px;margin:6px auto;border-radius:12px;background:rgba(255,255,255,.08);display:flex;align-items:flex-end;overflow:hidden}
+.bar b{display:block;width:100%;border-radius:12px;background:linear-gradient(180deg,#5eead4,var(--good))}
+.pct{font-size:.75rem;color:var(--good);font-variant-numeric:tabular-nums}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.trio .card{text-align:center;padding:14px 8px}
+.big{font-family:var(--display);font-size:3rem;font-weight:700;line-height:1}
+.glyph{font-size:2.6rem;line-height:1.2}
+.pill{display:inline-block;padding:3px 10px;border-radius:999px;background:rgba(255,255,255,.08);font-size:.78rem;font-weight:700}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.tabs button{flex:none;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:999px;padding:8px 14px;font:600 .85rem var(--body);cursor:pointer}
+.tabs button.on{background:rgba(255,255,255,.12);color:var(--ink)}
+details{border:1px solid var(--line);border-radius:16px;padding:14px 16px;background:var(--card)}
+summary{cursor:pointer;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+ul.check{list-style:none;padding:0;margin:8px 0;display:grid;gap:8px}
+ul.check li::before{content:"✓ ";color:var(--good);font-weight:700}
+ul.check.x li::before{content:"✕ ";color:var(--bad)}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.kv:last-child{border:0}
+.cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
+.cats button{background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:16px;padding:14px 6px;font:600 .82rem var(--body);cursor:pointer;display:grid;gap:6px;justify-items:center}
+.cats button span{font-size:1.5rem}
+.result{display:grid;gap:8px}
+.score{font-family:var(--display);font-size:2.4rem;font-weight:700}
+.chat{display:grid;gap:10px;max-height:52vh;overflow:auto}
+.msg{padding:10px 14px;border-radius:16px;max-width:85%;line-height:1.45}
+.msg.me{justify-self:end;background:rgba(249,115,22,.25)}
+.msg.ai{background:rgba(255,255,255,.07)}
+.month{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.month div{aspect-ratio:1;max-width:100%;border-radius:10px;display:grid;place-items:center;font-size:.8rem;font-variant-numeric:tabular-nums}
+nav.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;justify-content:space-around;
+  background:rgba(8,6,20,.92);border-top:1px solid var(--line);padding:8px max(8px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
+nav.tabbar button{background:none;border:0;color:var(--muted);font:600 .75rem var(--body);display:grid;gap:3px;justify-items:center;cursor:pointer;padding:4px 10px}
+nav.tabbar button span{font-size:1.3rem}
+nav.tabbar button.on{color:var(--amber)}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:#120c2a;padding:10px 18px;border-radius:999px;font-weight:700;z-index:9}
+@media (max-width:480px){.tools{grid-template-columns:repeat(4,1fr);gap:8px}.tool span{width:54px;height:54px}.big{font-size:2.3rem}}
+@media (prefers-reduced-motion:no-preference){.orb{animation:float 6s ease-in-out infinite}@keyframes float{50%{transform:translateY(-8px)}}}
+</style>
+
+<canvas class="stars" id="stars"></canvas>
+<main id="app"></main>
+<nav class="tabbar" id="tabbar"></nav>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/* ---------- Storage (safe) ---------- */
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+/* ---------- Numerology & astrology math ---------- */
+const MASTER=[11,22,33];
+function reduce(n,keep=true){while(n>9&&!(keep&&MASTER.includes(n)))n=String(n).split("").reduce((a,b)=>a+ +b,0);return n}
+const digits=s=>String(s).split("").reduce((a,b)=>a+ +b,0);
+function lifePath(d){return reduce(digits(d.getMonth()+1)+digits(d.getDate())+digits(d.getFullYear()))}
+function universalDay(t){return reduce(reduce(t.getMonth()+1)+reduce(t.getDate())+reduce(digits(t.getFullYear())))}
+function personalYear(b,t){let y=t.getFullYear();const bd=new Date(y,b.getMonth(),b.getDate());if(t<bd)y--;return {n:reduce(digits(b.getMonth()+1)+digits(b.getDate())+digits(y),false),until:new Date(y+1,b.getMonth(),b.getDate()-1)}}
+function personalMonth(b,t){return reduce(personalYear(b,t).n+t.getMonth()+1,false)}
+function personalDay(b,t){return reduce(personalMonth(b,t)+t.getDate(),false)}
+const ANIMALS=["Rat","Ox","Tiger","Rabbit","Dragon","Snake","Horse","Goat","Monkey","Rooster","Dog","Pig"];
+const ANIMAL_ICON={Rat:"🐀",Ox:"🐂",Tiger:"🐅",Rabbit:"🐇",Dragon:"🐉",Snake:"🐍",Horse:"🐎",Goat:"🐐",Monkey:"🐒",Rooster:"🐓",Dog:"🐕",Pig:"🐖"};
+function chineseAnimal(d){let y=d.getFullYear();if(d.getMonth()===0||(d.getMonth()===1&&d.getDate()<4))y--;return ANIMALS[((y-1900)%12+12)%12]} // approx. Lunar New Year cutoff
+const SIGNS=[["Capricorn","♑",1,19],["Aquarius","♒",2,18],["Pisces","♓",3,20],["Aries","♈",4,19],["Taurus","♉",5,20],["Gemini","♊",6,20],["Cancer","♋",7,22],["Leo","♌",8,22],["Virgo","♍",9,22],["Libra","♎",10,22],["Scorpio","♏",11,21],["Sagittarius","♐",12,21],["Capricorn","♑",13,0]];
+function westernSign(d){const m=d.getMonth()+1,day=d.getDate();const s=SIGNS[m-1];return day<=s[3]?{name:s[0],g:s[1]}:{name:SIGNS[m][0],g:SIGNS[m][1]}}
+
+/* ---------- Meanings ---------- */
+const LP={
+1:{t:"Independence, leadership and new beginnings",d:"You are a self-starter who learns by doing. You do your best work when you set the direction yourself.",s:["Decisive","Original","Driven"],w:["Impatient","Stubborn","Hard to ask for help"],c:"Founder, manager, inventor, solo creator",l:"Needs a partner who gives space and respects ambition."},
+2:{t:"Partnership, sensitivity and diplomacy",d:"You read people and rooms easily. Harmony and teamwork bring out your best.",s:["Empathetic","Patient","Cooperative"],w:["People-pleasing","Indecisive","Easily hurt"],c:"Mediator, counselor, designer, support roles",l:"Thrives with loyalty and gentle, steady affection."},
+3:{t:"Communication, creativity and childlike energy",d:"Excellent at communicating. Friends feel like family and you need to embrace the social side of life. You work smart, find creative solutions and use your network. Fun keeps you happy, while too much routine drains you fast.",s:["Expressive","Charming","Imaginative"],w:["Scattered focus","Moody","Avoids routine"],c:"Writer, performer, marketer, content creator",l:"Needs laughter, play and a partner who enjoys conversation."},
+4:{t:"Structure, discipline and building",d:"You build things that last. Plans, systems and hard work are your tools.",s:["Reliable","Organized","Practical"],w:["Rigid","Overworks","Resists change"],c:"Engineer, builder, accountant, operations",l:"Values stability, honesty and clear commitments."},
+5:{t:"Freedom, change and adventure",d:"You crave variety and new experiences. Change is where you grow.",s:["Adaptable","Curious","Bold"],w:["Restless","Impulsive","Avoids commitment"],c:"Travel, sales, journalism, entrepreneurship",l:"Needs a partner who loves adventure as much as you."},
+6:{t:"Care, responsibility and home",d:"You are the nurturer people lean on. Family and community matter deeply.",s:["Caring","Responsible","Loyal"],w:["Controlling","Self-sacrificing","Perfectionist"],c:"Teacher, healer, chef, community leader",l:"Devoted and protective in love."},
+7:{t:"Wisdom, analysis and inner search",d:"You look beneath the surface. Quiet time and deep study recharge you.",s:["Analytical","Intuitive","Wise"],w:["Withdrawn","Skeptical","Hard to reach"],c:"Researcher, analyst, scientist, spiritual teacher",l:"Needs trust and room for solitude."},
+8:{t:"Power, ambition and abundance",d:"You are built for big goals, money and influence. Balance keeps that power healthy.",s:["Ambitious","Strategic","Resilient"],w:["Workaholic","Controlling","Materialistic"],c:"Executive, investor, lawyer, business owner",l:"Respects a partner who is strong and self-assured."},
+9:{t:"Compassion, completion and service",d:"You care about the bigger picture. Helping others gives your life meaning.",s:["Generous","Idealistic","Creative"],w:["Martyrdom","Holds on to the past","Distant"],c:"Nonprofit, art, medicine, humanitarian work",l:"Loves deeply and needs shared values."},
+11:{t:"Intuition, inspiration and illumination",d:"A master number. You sense what others miss and can inspire many people.",s:["Visionary","Intuitive","Inspiring"],w:["Anxious","Overwhelmed","Self-doubt"],c:"Speaker, artist, healer, spiritual guide",l:"Needs emotional depth and patience."},
+22:{t:"Master builder",d:"A master number. You can turn big visions into real, lasting structures.",s:["Visionary","Practical","Powerful"],w:["Pressure","Overcontrol","Burnout"],c:"Architect, large-scale founder, policy maker",l:"Needs a partner who shares long-term goals."},
+33:{t:"Master teacher",d:"A master number. Your path is uplifting others through love and guidance.",s:["Compassionate","Devoted","Wise"],w:["Self-neglect","Overgiving","Idealism"],c:"Teacher, healer, mentor",l:"Love is service and devotion for you."}};
+const DAY={1:["New Starts","Begin something and take the lead.",["Starting projects","Bold decisions","Pitching ideas"],["Waiting for permission","Ego clashes"]],
+2:["Quiet Cooperation","Listen, partner and be patient.",["Teamwork","Repairing relationships","Negotiation"],["Forcing outcomes","Oversensitivity"]],
+3:["Speak Up","Create, share and connect.",["Content creation","Socializing","Brainstorming"],["Gossip","Scattered energy"]],
+4:["Build the Base","Do the steady work.",["Planning","Admin tasks","Fixing systems"],["Shortcuts","Rigidity"]],
+5:["Shake It Up","Try something new.",["Travel","Marketing","Networking"],["Impulse spending","Overcommitting"]],
+6:["Care & Home","Nurture yourself and others.",["Family time","Home projects","Helping someone"],["Controlling others","Neglecting self"]],
+7:["Look Within","Think, research and rest.",["Study","Reflection","Analysis"],["Big social plans","Overthinking"]],
+8:["Power Moves","Focus on money and results.",["Business deals","Asking for a raise","Investing time in goals"],["Power struggles","Greed"]],
+9:["Emotion Finishes Strong","Observe your reactions, stay calm under pressure, and complete what you started.",["Finishing tasks","Letting go","Giving back"],["Starting big new things","Dwelling on the past"]],
+11:["Stay Grounded","Intuition is loud today. Keep your feet on the ground.",["Playing it safe","Using emotional intensity to focus on goals","Visualizing outcomes"],["Taking risks in unstable situations","Getting caught up in chaos"]],
+22:["Master Build","Big plans can take shape.",["Long-term planning","Leading groups"],["Overload","Perfectionism"]],
+33:["Lead With Love","Teach and uplift.",["Mentoring","Healing conversations"],["Overgiving"]]};
+const PY={1:"New cycle",2:"Patience & partnership",3:"Expression & fun",4:"Hard work & foundations",5:"Change & freedom",6:"Family & responsibility",7:"Reflection & inner growth",8:"Power & harvest",9:"Endings & release"};
+
+/* ---------- Compatibility ---------- */
+const FRIENDS={1:[1,5,7],2:[2,4,8],3:[3,6,9],4:[2,4,8],5:[1,5,7],6:[3,6,9],7:[1,5,7],8:[2,4,8],9:[3,6,9]};
+const ENEMY={1:[8],2:[5],3:[4],4:[3,5],5:[2,4],6:[7],7:[6,8],8:[1,7],9:[]};
+const base=n=>MASTER.includes(n)?reduce(n,false):n;
+function numMatch(a,b){a=base(a);b=base(b);if(FRIENDS[a].includes(b))return 90;if(ENEMY[a].includes(b))return 45;return 70}
+const TRINES=[["Rat","Dragon","Monkey"],["Ox","Snake","Rooster"],["Tiger","Horse","Dog"],["Rabbit","Goat","Pig"]];
+const CLASH={Rat:"Horse",Ox:"Goat",Tiger:"Monkey",Rabbit:"Rooster",Dragon:"Dog",Snake:"Pig"};
+function animalMatch(a,b){if(TRINES.some(t=>t.includes(a)&&t.includes(b)))return 95;if(CLASH[a]===b||CLASH[b]===a)return 35;return 68}
+function hash(s){let h=7;for(const c of s)h=(h*31+c.charCodeAt(0))%997;return h}
+function dayScore(b,t){const s=numMatch(lifePath(b),universalDay(t))*.6+numMatch(personalYear(b,t).n,personalDay(b,t))*.4;return Math.max(40,Math.min(99,Math.round(s+hash(t.toDateString())%9-4)))}
+function compare(b1,b2){return Math.round(numMatch(lifePath(b1),lifePath(b2))*.6+animalMatch(chineseAnimal(b1),chineseAnimal(b2))*.4)}
+
+/* ---------- Discovery data ---------- */
+const CATS={Locations:["Lisbon","Kyoto","Bamako","Cape Town","Vancouver","Marrakech","Reykjavik","Mexico City"],
+People:["Teddy Roosevelt|1858-10-27","Prince|1958-06-07","Sylvia Plath|1932-10-27","Oprah Winfrey|1954-01-29","Elon Musk|1971-06-28","Rihanna|1988-02-20","Salif Keita|1949-08-25"],
+Cars:["Toyota Land Cruiser","Tesla Model 3","Porsche 911","Honda Civic","Range Rover","Mazda MX-5"],
+Clothing:["Earth tones","Royal blue","Gold accents","Linen basics","Monochrome black","Bold prints"],
+Banks:["Credit union","Online bank","Large national bank","Local community bank"],
+Dining:["Street food","Fine dining","Family-style","Plant-based","Seafood","Coffee house"],
+Hobbies:["Photography","Chess","Music production","Hiking","Cooking","Writing"],
+Sports:["Soccer","Tennis","Basketball","Swimming","Boxing","Cycling"],
+Travel:["Beach escape","City break","Road trip","Mountain retreat","Safari"],
+Shopping:["Vintage","Tech","Markets","Luxury","Handmade"]};
+const CAT_ICON={Locations:"🏙️",People:"👤",Clothing:"👕",Cars:"🚗",Banks:"🏛️",Dining:"🍽️",Hobbies:"🎨",Sports:"🏆",Travel:"🧳",Shopping:"🛍️"};
+
+/* ---------- State ---------- */
+let S={user:store.get("aura.user",null),tab:"home",calTab:"today",calOffset:0,calcTab:"Overview",calcDate:null,understand:"LIFE PATH",cat:null,chat:store.get("aura.chat",[]),slide:0};
+const today=()=>{const t=new Date();t.setHours(0,0,0,0);return t};
+const fmt=(d,o)=>d.toLocaleDateString(undefined,o||{month:"long",day:"numeric",year:"numeric"});
+const parse=s=>{const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
+const iso=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ord=n=>n+(["th","st","nd","rd"][(n%100>10&&n%100<14)?0:Math.min(n%10,4)%4]||"th");
+function toast(m){const t=document.getElementById("toast");t.textContent=m;t.hidden=false;clearTimeout(t._t);t._t=setTimeout(()=>t.hidden=true,2200)}
+const $=id=>document.getElementById(id);
+
+/* Example profile so the app opens in a working state */
+if(!S.user){S.user={name:"Example User",birth:"1986-03-03",example:true}}
+const B=()=>parse(S.user.birth);
+
+/* ---------- Views ---------- */
+const LOGO=`<svg viewBox="0 0 40 40"><defs><linearGradient id="lg" x1="0" x2="1"><stop offset="0" stop-color="#c4b5fd"/><stop offset="1" stop-color="#f9a8d4"/></linearGradient></defs><path d="M20 2l16 9v18l-16 9-16-9V11z" fill="url(#lg)"/><path d="M20 10l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#fbbf24" stroke="#120c2a" stroke-width="1.5"/></svg>`;
+
+function home(){
+  const t=today(),ud=universalDay(t),sg=westernSign(t),b=B();
+  const slides=[
+    `<div><div class="eyebrow">Ask Aura</div><h1>Speak it into reality</h1><button class="btn" onclick="go('chat')">Talk to me ✦</button></div><div class="orb"></div>`,
+    `<div style="grid-column:1/-1"><div class="eyebrow">Energy calendar</div><h1 style="font-size:1.7rem">See what's ahead</h1><div class="week">${[0,1,2,3,4,5,6].map(i=>{const d=new Date(t);d.setDate(t.getDate()+i);const p=dayScore(b,d);return`<div><div class="muted" style="font-size:.7rem">${fmt(d,{weekday:"short"}).toUpperCase()}</div><b>${d.getDate()}</b><div class="bar"><b style="height:${p}%"></b></div><div class="pct">${p}%</div></div>`}).join("")}</div></div>`,
+    `<div><div class="eyebrow">Your number</div><h1>Life Path ${lifePath(b)}</h1><button class="btn" onclick="go('calc')">Open calculator</button></div><div class="big" style="color:var(--gold);font-size:5rem">${lifePath(b)}</div>`];
+  return `
+  <div class="top"><div class="logo">${LOGO}<div>${fmt(t,{weekday:"long"})},<br>${fmt(t,{month:"long",day:"numeric"})}</div></div>
+    <button class="btn ghost" onclick="go('profile')" aria-label="Profile">${esc(S.user.name.split(" ")[0])}</button></div>
+  ${S.user.example?`<div class="card row" style="justify-content:space-between"><span>You're viewing an example profile.</span><button class="btn" onclick="go('onboard')">Enter my birthday</button></div>`:""}
+  <section class="hero" onclick="">${slides[S.slide]}</section>
+  <div class="dots">${slides.map((_,i)=>`<i class="${i===S.slide?"on":""}" onclick="S.slide=${i};render()" style="cursor:pointer"></i>`).join("")}</div>
+  <div class="card daycard" onclick="go('calendar')"><div class="num">${ud}</div><div style="flex:1"><h3>Universal ${ud} Day</h3><div class="muted">The ${ord(t.getDate())} • ${sg.name} Season</div></div><span>›</span></div>
+  <div class="top"><h2>Explore your tools</h2></div>
+  <div class="tools">${[["Compatibility","⚭","check"],["Forecasts","📈","calendar"],["Study","📖","study"],["Explore","🌐","search"],["Checker","⚖","check"],["Western","☉","western"],["For You","✦","foryou"],["Chat","💬","chat"]].map(([n,i,v])=>`<button class="tool" onclick="go('${v}')"><span>${i}</span>${n}</button>`).join("")}</div>
+  ${askBar()}`}
+
+function askBar(){return `<form class="ask" onsubmit="event.preventDefault();ask($('askq').value)"><div class="mini"></div><input id="askq" placeholder="Ask Aura anything" autocomplete="off"><button class="btn" style="padding:8px 14px">→</button></form>`}
+
+function calc(){
+  const b=S.calcDate?parse(S.calcDate):B(),t=today(),lp=lifePath(b),m=LP[lp],py=personalYear(b,t),pm=personalMonth(b,t),an=chineseAnimal(b),sg=westernSign(b);
+  const tabs=["Overview","Birthday","Strengths","Weaknesses","Career","Love","Your Years","Matches"];
+  let body="";
+  const T=S.calcTab;
+  if(T==="Overview")body=`<h3>Life Path ${lp}</h3><p style="color:var(--orb1)">${m.t}</p><p>${m.d}</p>`;
+  if(T==="Birthday")body=`<h3>Born on the ${ord(b.getDate())}</h3><p>Your birthday number is <b>${reduce(b.getDate())}</b>: ${LP[reduce(b.getDate())].t.toLowerCase()}. It adds this flavor to your Life Path ${lp}.</p>`;
+  if(T==="Strengths")body=`<h3>Strengths</h3><ul class="check">${m.s.map(x=>`<li>${x}</li>`).join("")}</ul>`;
+  if(T==="Weaknesses")body=`<h3>Watch outs</h3><ul class="check x">${m.w.map(x=>`<li>${x}</li>`).join("")}</ul>`;
+  if(T==="Career")body=`<h3>Career fit</h3><p>${m.c}</p>`;
+  if(T==="Love")body=`<h3>In love</h3><p>${m.l}</p><p class="muted">Best number matches: ${FRIENDS[base(lp)].join(", ")}</p>`;
+  if(T==="Your Years")body=`<h3>Personal Years</h3>${[0,1,2,3,4].map(i=>{const y=new Date(t);y.setFullYear(t.getFullYear()+i);const p=personalYear(b,y);return`<div class="kv"><span>${p.until.getFullYear()-1}–${p.until.getFullYear()}</span><span><b>${p.n}</b> · ${PY[p.n]}</span></div>`}).join("")}`;
+  if(T==="Matches")body=`<h3>Matches</h3><div class="kv"><span>Strong numbers</span><b>${FRIENDS[base(lp)].join(" · ")}</b></div><div class="kv"><span>Challenging numbers</span><b>${ENEMY[base(lp)].join(" · ")||"None"}</b></div><div class="kv"><span>Friendly animals</span><b>${TRINES.find(x=>x.includes(an)).filter(x=>x!==an).join(" · ")}</b></div><div class="kv"><span>Clash animal</span><b>${CLASH[an]||Object.keys(CLASH).find(k=>CLASH[k]===an)}</b></div>`;
+  return `
+  <div class="trio">
+    <div class="card"><div class="eyebrow" style="color:var(--ink)">Life Path</div><div class="big">${lp}</div><div class="muted">Day ${ord(b.getDate())}</div><div class="row" style="justify-content:center;margin-top:6px"><span class="pill">PY ${py.n}</span><span class="pill">PM ${pm}</span></div></div>
+    <div class="card"><div class="eyebrow" style="color:var(--ink)">Eastern</div><div class="glyph">${ANIMAL_ICON[an]}</div><div>${an}</div></div>
+    <div class="card"><div class="eyebrow" style="color:var(--ink)">Western</div><div class="glyph">${sg.g}</div><div>${sg.name}</div></div>
+  </div>
+  <label>Any birthday<input type="date" id="calcdate" value="${iso(b)}" onchange="S.calcDate=this.value;render()"></label>
+  <div class="tabs">${tabs.map(x=>`<button class="${x===T?"on":""}" onclick="S.calcTab='${x}';render()">${x}</button>`).join("")}</div>
+  <div class="card">${body}</div>
+  <button class="btn block" onclick="ask('Give me a reading for life path ${lp}')">Get a Reading</button>
+  <details><summary style="color:var(--gold)">✦ Personality</summary><p>${m.d}</p></details>
+  <details><summary style="color:var(--good)">🏆 Advantages</summary><ul class="check">${m.s.map(x=>`<li>${x}</li>`).join("")}</ul></details>
+  <details><summary style="color:var(--amber)">✓ Need to do</summary><p>Lean into: ${m.c.toLowerCase()}. ${m.l}</p></details>
+  <details><summary style="color:var(--bad)">⚠ Problem</summary><ul class="check x">${m.w.map(x=>`<li>${x}</li>`).join("")}</ul></details>`}
+
+function calendar(){
+  const b=B(),t0=today();
+  const t=new Date(t0);t.setDate(t0.getDate()+S.calOffset);
+  const head=`<div class="row" style="justify-content:space-between"><div class="tabs">${["today","monthly","yearly"].map(x=>`<button class="${S.calTab===x?"on":""}" onclick="S.calTab='${x}';render()">${x[0].toUpperCase()+x.slice(1)}</button>`).join("")}</div></div>`;
+  if(S.calTab==="monthly"){
+    const first=new Date(t.getFullYear(),t.getMonth(),1),n=new Date(t.getFullYear(),t.getMonth()+1,0).getDate();
+    let cells="SMTWTFS".split("").map(x=>`<div class="muted">${x}</div>`).join("")+"<div></div>".repeat(first.getDay());
+    for(let i=1;i<=n;i++){const d=new Date(t.getFullYear(),t.getMonth(),i),p=dayScore(b,d);cells+=`<div style="background:rgba(52,211,153,${(p-40)/80});cursor:pointer;${d.getTime()===t0.getTime()?"outline:2px solid var(--gold)":""}" onclick="S.calTab='today';S.calOffset=${Math.round((d-t0)/864e5)};render()">${i}</div>`}
+    return head+`<div class="card"><h3>${fmt(t,{month:"long",year:"numeric"})}</h3><p class="muted">Greener days match your energy better. Tap a day for details.</p><div class="month">${cells}</div></div><div class="card"><div class="eyebrow">Personal Month</div><h3>${personalMonth(b,t)} · ${PY[reduce(personalMonth(b,t),false)]}</h3></div>`}
+  if(S.calTab==="yearly"){const py=personalYear(b,t);
+    return head+`<div class="card"><div class="eyebrow">Personal Year until ${fmt(py.until)}</div><div class="big">${py.n}</div><h3>${PY[py.n]}</h3></div><div class="card">${Array.from({length:12},(_,i)=>{const d=new Date(t.getFullYear(),i,15);return`<div class="kv"><span>${fmt(d,{month:"long"})}</span><span><b>${personalMonth(b,d)}</b> · ${PY[personalMonth(b,d)]}</span></div>`}).join("")}</div>`}
+  const ud=universalDay(t),[title,desc,good,bad]=DAY[ud],pd=personalDay(b,t),score=dayScore(b,t);
+  const week=[...Array(7)].map((_,i)=>{const d=new Date(t);d.setDate(t.getDate()-t.getDay()+i);const off=Math.round((d-t0)/864e5);const on=d.getTime()===t.getTime();return`<button style="background:none;border:0;color:var(--ink);cursor:pointer;font:inherit" onclick="S.calOffset=${off};render()"><div class="muted">${"SMTWTFS"[i]}</div><div class="num" style="font-size:1.1rem;min-width:40px;height:40px;margin:auto;${on?"background:var(--gold);color:#2b1400":"background:none;color:var(--ink)"}">${d.getDate()}</div></button>`}).join("");
+  const U=S.understand,uData=U==="LIFE PATH"?DAY[ud]:U==="DAY"?DAY[pd]||DAY[reduce(pd,false)]:DAY[reduce(ud+pd,false)];
+  const jkey="aura.journal."+iso(t),j=store.get(jkey,{themes:[],text:""});
+  return head+`
+  <div class="row" style="justify-content:space-between"><button class="btn ghost" onclick="S.calOffset-=7;render()">‹</button><b>${fmt(t,{weekday:"long",month:"long",day:"numeric",year:"numeric"})}</b><button class="btn ghost" onclick="S.calOffset+=7;render()">›</button></div>
+  <div class="week">${week}</div>
+  <h2>Today's Energy</h2>
+  <div class="card" style="display:grid;gap:12px">
+    <div class="row" style="justify-content:space-around;text-align:center"><div><div class="big" style="color:var(--amber)">${ud}</div>Universal Day</div><div><div class="score" style="color:var(--good)">${score}%</div>Your match</div><div><div class="big" style="color:var(--amber)">${t.getDate()}</div>Of the month</div></div>
+    <h3>${title}</h3><p class="muted" style="margin:0">${desc}</p>
+    ${score>=85?`<div class="pill" style="color:var(--good)">⚡ Powerful Alignment Day</div>`:""}
+    <button class="btn block" onclick="ask('What does today hold for me?')">Get Today's Reading</button>
+  </div>
+  <h2>Understand Today</h2>
+  <div class="card">
+    <div class="tabs">${["LIFE PATH","DAY","COMBO"].map(x=>`<button class="${x===U?"on":""}" onclick="S.understand='${x}';render()">${x}</button>`).join("")}</div>
+    <div class="eyebrow" style="margin-top:12px">${U==="LIFE PATH"?ud+" universal":U==="DAY"?pd+" personal":"combined"} day</div>
+    <h3>${uData[0]}</h3><p>${uData[1]}</p>
+    <div style="color:var(--good);font-weight:700">GOOD FOR</div><ul class="check">${uData[2].map(x=>`<li>${x}</li>`).join("")}</ul>
+    <div style="color:var(--bad);font-weight:700">WATCH FOR</div><ul class="check x">${uData[3].map(x=>`<li>${x}</li>`).join("")}</ul>
+  </div>
+  <h2>Morning Energy Survey</h2>
+  <form class="card" style="display:grid;gap:12px" onsubmit="event.preventDefault();saveJournal('${jkey}')">
+    <h3>How will you use today's energy?</h3><div class="muted">Choose a theme (optional) or just write.</div>
+    <div class="tabs">${["Emotion","Spirituality","Completion","Focus","Social"].map(x=>`<button type="button" class="${j.themes.includes(x)?"on":""}" onclick="toggleTheme('${jkey}','${x}')">${x}</button>`).join("")}</div>
+    <textarea id="jtext" maxlength="280" rows="3" placeholder="What do you want to do today?">${esc(j.text)}</textarea>
+    <button class="btn block">Log Morning Plan</button>
+    <div class="muted" style="font-size:.8rem">Your journal stays in this browser only.</div>
+  </form>`}
+
+function search(){
+  const b=B();
+  const items=S.cat?CATS[S.cat].map(x=>{const [n,d]=x.split("|");const p=d?compare(b,parse(d)):Math.max(40,Math.min(99,numMatch(lifePath(b),reduce(digits(hash(n))))+hash(n+S.user.birth)%15-7));return{n,d,p}}).sort((a,c)=>c.p-a.p):[];
+  return `
+  <form class="ask" onsubmit="event.preventDefault();ask($('sq').value)"><div class="mini"></div><input id="sq" placeholder='Try "Best cars for my energy"'><button class="btn" style="padding:8px 14px">→</button></form>
+  <div class="cats">${Object.keys(CATS).map(c=>`<button onclick="S.cat='${c}';render()" style="${S.cat===c?"border-color:var(--gold)":""}"><span>${CAT_ICON[c]}</span>${c}</button>`).join("")}</div>
+  ${S.cat?`<div class="card"><h3>${S.cat} for your energy</h3>${items.map(i=>`<div class="kv"><span>${esc(i.n)}${i.d?` <span class="muted">· ${fmt(parse(i.d))}</span>`:""}</span><b style="color:${i.p>=80?"var(--good)":i.p<55?"var(--bad)":"var(--gold)"}">${i.p}%</b></div>`).join("")}</div>`:""}
+  <div class="tools" style="grid-template-columns:repeat(3,1fr)">
+    <button class="card tool" onclick="go('check')"><b>⚖ Checker</b><span class="muted" style="width:auto;height:auto;background:none;border:0;font-size:.8rem">Compare 2 people</span></button>
+    <button class="card tool" onclick="S.cat='People';render()"><b style="color:var(--good)">✓ Friendly</b><span class="muted" style="width:auto;height:auto;background:none;border:0;font-size:.8rem">Strong matches</span></button>
+    <button class="card tool" onclick="go('enemy')"><b style="color:var(--bad)">✕ Enemy</b><span class="muted" style="width:auto;height:auto;background:none;border:0;font-size:.8rem">Possible friction</span></button>
+  </div>
+  <div class="card"><h3>Born on this date</h3>${CATS.People.map(x=>x.split("|")).filter(([,d])=>{const p=parse(d),t=today();return p.getMonth()===t.getMonth()&&p.getDate()===t.getDate()}).map(([n,d])=>`<div class="kv"><span>${n}</span><span class="muted">${parse(d).getFullYear()}</span></div>`).join("")||`<p class="muted">No famous birthdays saved for today.</p>`}</div>`}
+
+function check(){
+  const b=B();const other=S.other||"1990-07-15",o=parse(other);const p=compare(b,o);
+  return `<h2>Compatibility Checker</h2>
+  <div class="card" style="display:grid;gap:12px">
+    <label>Your birthday<input type="date" value="${S.user.birth}" disabled></label>
+    <label>Their birthday<input type="date" id="other" value="${other}" onchange="S.other=this.value;render()"></label>
+  </div>
+  <div class="card result" style="text-align:center"><div class="score" style="color:${p>=80?"var(--good)":p<55?"var(--bad)":"var(--gold)"}">${p}%</div>
+    <div>${p>=80?"Strong match. You naturally support each other.":p<55?"Friction likely. Patience and clear talk help.":"Workable match with some effort."}</div>
+    <div class="kv"><span>Life Paths</span><b>${lifePath(b)} + ${lifePath(o)}</b></div>
+    <div class="kv"><span>Animals</span><b>${chineseAnimal(b)} + ${chineseAnimal(o)}</b></div>
+    <div class="kv"><span>Sun signs</span><b>${westernSign(b).name} + ${westernSign(o).name}</b></div></div>`}
+
+function enemy(){const lp=base(lifePath(B())),an=chineseAnimal(B());
+  return `<h2>Possible friction</h2><div class="card"><div class="kv"><span>Numbers</span><b style="color:var(--bad)">${ENEMY[lp].join(" · ")||"None"}</b></div><div class="kv"><span>Animal</span><b style="color:var(--bad)">${CLASH[an]||Object.keys(CLASH).find(k=>CLASH[k]===an)}</b></div><p class="muted">Friction isn't doom. These pairings simply need more patience.</p></div>`}
+
+function study(){return `<h2>Study numerology</h2>${Object.entries(LP).map(([k,v])=>`<details><summary>${k} · ${v.t}</summary><p>${v.d}</p><p class="muted">Careers: ${v.c}</p></details>`).join("")}
+  <div class="card"><h3>How Life Path is calculated</h3><p>Reduce month, day and year separately to single digits (keeping 11, 22, 33), add them, then reduce again. Example: 3/3/1986 → 3 + 3 + 6 (1+9+8+6=24→6) = 12 → 3.</p></div>`}
+
+function western(){const sg=westernSign(B());return `<h2>Western astrology</h2><div class="card" style="text-align:center"><div class="glyph" style="font-size:4rem">${sg.g}</div><h3>${sg.name}</h3></div>
+  <div class="card">${SIGNS.slice(0,12).map((s,i)=>`<div class="kv"><span>${s[1]} ${s[0]}</span><span class="muted">${fmt(new Date(2000,i,s[3]+1>31?1:1),{month:"short"})}</span></div>`).join("")}</div>`}
+
+function foryou(){const b=B(),t=today();const best=[...Array(14)].map((_,i)=>{const d=new Date(t);d.setDate(t.getDate()+i);return{d,p:dayScore(b,d)}}).sort((a,c)=>c.p-a.p).slice(0,3);
+  return `<h2>For you</h2><div class="card"><h3>Your best days in the next 2 weeks</h3>${best.map(x=>`<div class="kv"><span>${fmt(x.d,{weekday:"long",month:"short",day:"numeric"})}</span><b style="color:var(--good)">${x.p}%</b></div>`).join("")}</div>
+  <div class="card"><h3>This month's theme</h3><p>Personal Month ${personalMonth(b,t)}: ${PY[personalMonth(b,t)]}.</p></div>`}
+
+function profile(){const b=B(),t=today(),py=personalYear(b,t),pm=personalMonth(b,t);const pmEnd=new Date(t.getFullYear(),t.getMonth()+1,b.getDate()-1);
+  const lucky=[lifePath(b)*12,reduce(b.getDate())*20+2].map(x=>x%99||7);
+  return `<h2 style="text-align:center;color:var(--ink)">Your Energy Profile</h2>
+  <div class="card" id="pcard">
+    <div class="logo" style="color:var(--ink)">${LOGO} AURA</div>
+    <h1 style="margin-top:12px">${esc(S.user.name)}</h1>
+    <div class="trio" style="margin:14px 0"><div style="text-align:center"><div class="big">${lifePath(b)}</div>Life Path</div><div style="text-align:center"><div class="glyph">${ANIMAL_ICON[chineseAnimal(b)]}</div>${chineseAnimal(b)}</div><div style="text-align:center"><div class="glyph">${westernSign(b).g}</div>${westernSign(b).name}</div></div>
+    <div class="kv"><span class="muted">Birthday</span><span>${fmt(b)}</span></div>
+    <div class="kv"><span class="muted">Eastern year</span><span>Year of the ${chineseAnimal(b)}</span></div>
+    <div class="kv"><span class="muted">Western zodiac</span><span>${westernSign(b).name} Season</span></div>
+    <div class="kv"><span class="muted">Lucky numbers</span><b>${lucky.join(" · ")}</b></div>
+  </div>
+  <button class="btn block" onclick="shareCard()">Copy my card</button>
+  <div class="card"><div class="eyebrow">Your timing</div><div class="trio" style="grid-template-columns:1fr 1fr;text-align:center"><div><div class="big">${py.n}</div>Personal Year<div class="muted">Until ${fmt(py.until,{month:"short",day:"numeric",year:"numeric"})}</div></div><div><div class="big">${pm}</div>Personal Month<div class="muted">Until ${fmt(pmEnd,{month:"short",day:"numeric",year:"numeric"})}</div></div></div></div>
+  <button class="btn ghost block" onclick="go('onboard')">Edit name & birthday</button>`}
+
+function onboard(){const u=S.user.example?{name:"",birth:""}:S.user;return `
+  <div class="card" style="display:grid;gap:14px;margin-top:8vh">
+    <div class="logo" style="color:var(--ink)">${LOGO}<h1>Welcome to Aura</h1></div>
+    <p class="muted">Your birthday unlocks your Life Path, zodiac and daily energy.</p>
+    <form style="display:grid;gap:12px" onsubmit="event.preventDefault();saveUser()">
+      <label>Name<input id="uname" required value="${esc(u.name)}" placeholder="Your name"></label>
+      <label>Birthday<input id="ubirth" type="date" required value="${u.birth}"></label>
+      <button class="btn block">Save and continue</button>
+    </form></div>`}
+
+function chat(){return `<h2>Ask Aura</h2><div class="card chat" id="chatbox">${S.chat.length?S.chat.map(m=>`<div class="msg ${m.r}">${m.h}</div>`).join(""):`<div class="msg ai">Hi ${esc(S.user.name.split(" ")[0])}! Ask about today, your life path, love, career, or a match with someone's birthday (for example "match with 1990-07-15").</div>`}</div>
+  <div class="row">${["What does today hold?","My career","Love","Best days this month"].map(q=>`<button class="btn ghost" style="padding:8px 12px" onclick="ask('${q}')">${q}</button>`).join("")}</div>
+  ${askBar()}<button class="btn ghost" onclick="S.chat=[];store.set('aura.chat',[]);render()">Clear chat</button>`}
+
+/* ---------- Simple rule-based assistant (no server needed) ---------- */
+function answer(q){const b=B(),t=today(),lp=lifePath(b),m=LP[lp],ql=q.toLowerCase();
+  const dm=q.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if(dm){const o=new Date(+dm[1],dm[2]-1,+dm[3]);const p=compare(b,o);return `Your match with someone born ${fmt(o)} is <b>${p}%</b>. Life Paths ${lp} + ${lifePath(o)}, ${chineseAnimal(b)} + ${chineseAnimal(o)}.`}
+  if(/today|day/.test(ql)){const ud=universalDay(t);return `Today is a Universal ${ud} day (<b>${DAY[ud][0]}</b>). ${DAY[ud][1]} Your match with today is ${dayScore(b,t)}%. Good for: ${DAY[ud][2].join(", ").toLowerCase()}.`}
+  if(/career|job|work|money/.test(ql))return `As a Life Path ${lp}, careers that fit you: ${m.c}. Your strengths: ${m.s.join(", ").toLowerCase()}.`;
+  if(/love|partner|relationship/.test(ql))return `${m.l} Strong number matches for you: ${FRIENDS[base(lp)].join(", ")}.`;
+  if(/best|month|week/.test(ql)){const best=[...Array(30)].map((_,i)=>{const d=new Date(t);d.setDate(t.getDate()+i);return{d,p:dayScore(b,d)}}).sort((a,c)=>c.p-a.p).slice(0,3);return "Your strongest upcoming days: "+best.map(x=>`${fmt(x.d,{month:"short",day:"numeric"})} (${x.p}%)`).join(", ")+"."}
+  if(/car|cloth|food|travel|city|sport|hobby/.test(ql)){const c=Object.keys(CATS).find(k=>ql.includes(k.toLowerCase().slice(0,4)))||"Locations";S.cat=c;return `I opened <b>${c}</b> in Search ranked for your energy. <a href="#" onclick="go('search');return false" style="color:var(--gold)">See it</a>.`}
+  return `Life Path ${lp}: ${m.t.toLowerCase()}. ${m.d} You're in a Personal Year ${personalYear(b,t).n} (${PY[personalYear(b,t).n].toLowerCase()}).`}
+function ask(q){q=(q||"").trim();if(!q)return;S.chat.push({r:"me",h:esc(q)},{r:"ai",h:answer(q)});S.chat=S.chat.slice(-40);store.set("aura.chat",S.chat);go("chat");setTimeout(()=>{const c=$("chatbox");if(c)c.scrollTop=c.scrollHeight},0)}
+
+/* ---------- Actions ---------- */
+function saveUser(){S.user={name:$("uname").value.trim(),birth:$("ubirth").value};store.set("aura.user",S.user);toast("Profile saved");go("home")}
+function toggleTheme(k,x){const j=store.get(k,{themes:[],text:""});j.text=$("jtext").value;j.themes=j.themes.includes(x)?j.themes.filter(y=>y!==x):[...j.themes,x];store.set(k,j);render()}
+function saveJournal(k){const j=store.get(k,{themes:[],text:""});j.text=$("jtext").value;store.set(k,j);toast("Morning plan logged")}
+function shareCard(){const b=B();const txt=`${S.user.name} · Life Path ${lifePath(b)} · ${chineseAnimal(b)} · ${westernSign(b).name}`;
+  navigator.clipboard?.writeText(txt).then(()=>toast("Card copied")).catch(()=>toast(txt))}
+function go(v){S.tab=v;render();window.scrollTo(0,0)}
+
+/* ---------- Render ---------- */
+const VIEWS={home,calc,calendar,search,profile,onboard,chat,check,enemy,study,western,foryou};
+const NAV=[["home","⌂","Home"],["calc","▦","Calculator"],["calendar","📅","Calendar"],["search","⌕","Search"],["profile","◉","Profile"]];
+function render(){$("app").innerHTML=VIEWS[S.tab]();$("tabbar").innerHTML=NAV.map(([v,i,n])=>`<button class="${S.tab===v?"on":""}" onclick="go('${v}')"><span>${i}</span>${n}</button>`).join("")}
+setInterval(()=>{if(S.tab==="home"&&!document.activeElement?.id){S.slide=(S.slide+1)%3;render()}},7000);
+
+/* ---------- Stars ---------- */
+(function(){const c=$("stars"),x=c.getContext("2d");function draw(){c.width=innerWidth;c.height=innerHeight;for(let i=0;i<140;i++){x.fillStyle=`rgba(255,255,255,${Math.random()*.6+.1})`;x.beginPath();x.arc(Math.random()*c.width,Math.random()*c.height*.7,Math.random()*1.3,0,7);x.fill()}}draw();addEventListener("resize",draw)})();
+render();
+</script>
